@@ -12,7 +12,7 @@
 (defn config [] {:host (:telefunken-smtp-host env)
                  :user (:telefunken-smtp-user env)
                  :pass (:telefunken-smtp-password env)
-                 :port (Integer. (:telefunken-smtp-port env))})
+                 :port (Integer. ^String (:telefunken-smtp-port env))})
 
 (defn email [to subject body & {:keys [bcc]}] 
   (send-message (config)
@@ -39,7 +39,7 @@
                  :body [{:type "text/html"
                          :content body}
                         {:type :inline
-                         :content (java.io.File. document)
+                         :content (java.io.File. ^String document)
                          :content-type "application/pdf"}]}))
 
 
