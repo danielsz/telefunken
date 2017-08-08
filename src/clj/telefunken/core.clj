@@ -1,9 +1,8 @@
 (ns telefunken.core
   (:require [postal.core :refer [send-message]]
             [postal.support :refer [message-id]]
-            [environ.core :refer [env]]))
-
-;(System/setProperty "postal.version" "1.11.3")
+            [environ.core :refer [env]])
+  (:import java.net.InetAddress))
 
 (defn email? [s]
   (let [regex #"(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"]
@@ -21,7 +20,9 @@
                  :bcc "bellybag@gmail.com" ;should be bcc
                  :subject subject
                  :body [{:type "text/html" :content body}]
-                 :message-id #(message-id "mg.twitter-fu.com")}))
+                 :message-id (if-let [domain (:telefunken-hostname env)]
+                               #(message-id domain)
+                               #(message-id (str "postal." (.getHostName (InetAddress/getLocalHost)))))}))
 
 (defn email-from [from subject body & {:keys [type] :or {type "text/plain"}}]
   (send-message (config)
