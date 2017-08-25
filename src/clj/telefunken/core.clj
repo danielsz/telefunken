@@ -17,7 +17,7 @@
   (send-message (config)
                 {:from (:telefunken-email env)
                  :to to
-                 :bcc "bellybag@gmail.com" ;should be bcc
+                 :bcc bcc
                  :subject subject
                  :body [{:type "text/html" :content body}]
                  :message-id (if-let [domain (:telefunken-hostname env)]
