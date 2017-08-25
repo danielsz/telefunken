@@ -4,6 +4,9 @@
  :dependencies '[[com.draines/postal "2.0.2"]
                  [org.clojure/tools.logging "0.3.1"]
                  [cljs-ajax "0.6.0"]
+                 [org.danielsz/lang-utils "0.1.0-SNAPSHOT"]
+                 [clj-http "3.7.0"]
+                 [environ "1.1.0"]
                  [org.danielsz/om-flash-bootstrap "0.1.0-SNAPSHOT"]])
 
 (task-options!

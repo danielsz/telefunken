@@ -42,5 +42,3 @@
                         {:type :inline
                          :content (java.io.File. ^String document)
                          :content-type "application/pdf"}]}))
-
-
