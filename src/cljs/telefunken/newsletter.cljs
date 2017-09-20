@@ -17,7 +17,7 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:button-status true})
+      {:button-status false})
     om/IWillMount
     (will-mount [_]
       (let [chsk-send! (om/get-state owner :chsk-send!)]
@@ -44,7 +44,6 @@
                                    (dom/p nil (str "Email: " email))
                                    (dom/button #js {:className "btn btn-default"
                                                     :type "submit"
-                                                    :ref "unsubscribe-button"
                                                     :disabled (om/get-state owner :button-status)
                                                     :onClick (fn [_]
                                                                (if (not (valid? expiration))
@@ -57,5 +56,5 @@
                                                                                       [{:error message}] (f/warn flash message)
                                                                                       [:chsk/timeout] (f/warn flash "The request timed out.")
                                                                                       :else (println "no match found")))))
-                                                               (.setAttribute (om/get-node owner "unsubscribe-button") "disabled" "disabled"))}
+                                                               (om/set-state! owner :button-status true))}
                                                "Confirm"))))))))

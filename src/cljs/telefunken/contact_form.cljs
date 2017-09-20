@@ -11,6 +11,9 @@
     om/IInitState
     (init-state [_]
       {:submit-status false})
+    om/IWillMount
+    (will-mount [_]
+      (om/set-state! owner :submit-status (not ((om/get-state owner :logged-in?)))))
     om/IDisplayName
     (display-name [this]
       "contact")
@@ -46,7 +49,7 @@
                                                                          :placeholder "Please type the content of your inquiry"}))
                                              (dom/button #js {:className "btn btn-default"
                                                               :type "submit"
-                                                              :disabled (om/get-state owner :button-status)
+                                                              :disabled (om/get-state owner :submit-status)
                                                               :onClick (fn [e]
                                                                          (.preventDefault e)
                                                                          (if-not (logged-in?) (f/warn flash "Please sign in first")
@@ -59,7 +62,7 @@
                                                                                                                 (f/bless flash (str "Mail succesfully sent from " response))
                                                                                                                 (set! (.-value (om/get-node owner "body")) "")
                                                                                                                 (set! (.-value (om/get-node owner "subject")) "")
-                                                                                                                (om/set-state! owner :button-status true))
+                                                                                                                (om/set-state! owner :submit-status true))
                                                                                                      :error-handler (fn [status status-test] (f/bless flash "Succesfully published"))})
                                                                                    (f/warn flash (.-validationMessage (om/get-node owner "body"))))))} "Submit"))
                                    (dom/p nil (when-not (logged-in?) "Please sign in before typing your message.")))))))))
