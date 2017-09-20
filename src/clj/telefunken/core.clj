@@ -27,7 +27,7 @@
 (defn email-from [from subject body & {:keys [type] :or {type "text/plain"}}]
   (send-message (config)
                 {:from from
-                 :to (:telefunken-email env)
+                 :to (or (:telefunken-contact-email env) (:telefunken-email env))
                  :subject subject
                  :body [{:type type :content body}]}))
 
