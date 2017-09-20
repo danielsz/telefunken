@@ -8,6 +8,9 @@
   "Om component for new contact"
   [data owner]
   (reify
+    om/IInitState
+    (init-state [_]
+      {:submit-status false})
     om/IDisplayName
     (display-name [this]
       "contact")
@@ -16,7 +19,8 @@
       (let [flash (om/get-state owner :flash)
             chsk-send! (om/get-state owner :chsk-send!)
             logged-in? (om/get-state owner :logged-in?)
-            chsk-state (om/get-state owner :chsk-state)]
+            chsk-state (om/get-state owner :chsk-state)
+            from-fn (om/get-state owner :from-fn)]
         (dom/div #js {:className "row"}
                  (dom/div #js {:className "col-md-6 col-md-offset-3"}
                           (dom/div #js {:className "well"}
@@ -42,19 +46,20 @@
                                                                          :placeholder "Please type the content of your inquiry"}))
                                              (dom/button #js {:className "btn btn-default"
                                                               :type "submit"
+                                                              :disabled (om/get-state owner :button-status)
                                                               :onClick (fn [e]
                                                                          (.preventDefault e)
                                                                          (if-not (logged-in?) (f/warn flash "Please sign in first")
                                                                                  (if (.checkValidity (om/get-node owner "body"))
                                                                                    (POST "/contact" {:headers {"X-CSRF-Token" (:csrf-token @chsk-state)}
-                                                                                                     :params {:from (str (:name (:user @data)) " <"(:email (:user @data)) ">")
+                                                                                                     :params {:from (from-fn @data)
                                                                                                               :subject (.-value (om/get-node owner "subject"))
                                                                                                               :body (.-value (om/get-node owner "body"))}
                                                                                                      :handler (fn [response]
                                                                                                                 (f/bless flash (str "Mail succesfully sent from " response))
                                                                                                                 (set! (.-value (om/get-node owner "body")) "")
-                                                                                                                (set! (.-value (om/get-node owner "subject")) ""))
+                                                                                                                (set! (.-value (om/get-node owner "subject")) "")
+                                                                                                                (om/set-state! owner :button-status true))
                                                                                                      :error-handler (fn [status status-test] (f/bless flash "Succesfully published"))})
                                                                                    (f/warn flash (.-validationMessage (om/get-node owner "body"))))))} "Submit"))
-                                   (dom/p nil (when-not (logged-in?) "Please sign in before typing your message. ") "Or send us an email at "
-                                          (dom/a #js {:href "mailto:admin@twitter-fu.com?&subject=Twitter%20Fu%20--%20AutoTweet"} "admin@twitter-fu.com")))))))))
+                                   (dom/p nil (when-not (logged-in?) "Please sign in before typing your message.")))))))))
