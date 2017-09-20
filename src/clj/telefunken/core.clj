@@ -24,10 +24,11 @@
                                #(message-id domain)
                                #(message-id (str "postal." (.getHostName (InetAddress/getLocalHost)))))}))
 
-(defn email-from [from subject body & {:keys [type] :or {type "text/plain"}}]
+(defn email-from [from subject body & {:keys [type to] :or {type "text/plain"
+                                                            to (:telefunken-email env)}}]
   (send-message (config)
                 {:from from
-                 :to (or (:telefunken-contact-email env) (:telefunken-email env))
+                 :to to
                  :subject subject
                  :body [{:type type :content body}]}))
 
