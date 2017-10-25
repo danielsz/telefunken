@@ -46,15 +46,16 @@
                                                     :type "submit"
                                                     :disabled (:button-status state)
                                                     :onClick (fn [_]
-                                                               (if (valid? expiration)
-                                                                 (chsk-send! [:telefunken/api {:unsubscribe-from-newsletter email}] 8000
-                                                                             (fn [cb-reply]
-                                                                               (match [cb-reply]
-                                                                                      [{:success message}] (f/bless flash message)
-                                                                                      [{:info message}] (f/info flash message)
-                                                                                      [{:error message}] (f/warn flash message)
-                                                                                      [:chsk/timeout] (f/warn flash "The request timed out.")
-                                                                                      :else (println "no match found"))))
-                                                                 (f/warn flash "That link has expired"))
-                                                               (om/set-state! owner :button-status true))}
+                                                               (when (:unsubscribe-details state)
+                                                                 (if (valid? expiration)
+                                                                   (chsk-send! [:telefunken/api {:unsubscribe-from-newsletter email}] 8000
+                                                                               (fn [cb-reply]
+                                                                                 (match [cb-reply]
+                                                                                        [{:success message}] (f/bless flash message)
+                                                                                        [{:info message}] (f/info flash message)
+                                                                                        [{:error message}] (f/warn flash message)
+                                                                                        [:chsk/timeout] (f/warn flash "The request timed out.")
+                                                                                        :else (println "no match found"))))
+                                                                   (f/warn flash "That link has expired"))
+                                                                 (om/set-state! owner :button-status true)))}
                                                "Confirm"))))))))
