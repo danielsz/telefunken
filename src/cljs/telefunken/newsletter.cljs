@@ -22,7 +22,7 @@
     om/IWillMount
     (will-mount [_]
       (let [chsk-send! (om/get-state owner :chsk-send!)]
-        (chsk-send! [:telefunken/api {:unsubscribe-newsletter-details :newsletter}] 8000
+        (chsk-send! [:telefunken/api {:unsubscribe-details :newsletter}] 8000
                     (fn [details]
                       (om/set-state! owner :unsubscribe-details details)))))
     om/IDisplayName
@@ -49,7 +49,7 @@
                                                     :onClick (fn [_]
                                                                (if (not (valid? expiration))
                                                                  (f/warn flash "That link has expired")
-                                                                 (chsk-send! [:twitter-fu/api {:unsubscribe-from-newsletter email}] 8000
+                                                                 (chsk-send! [:telefunken/api {:unsubscribe-from-newsletter email}] 8000
                                                                              (fn [cb-reply]
                                                                                (match [cb-reply]
                                                                                       [{:success message}] (f/bless flash message)
