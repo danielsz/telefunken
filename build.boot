@@ -25,6 +25,8 @@
 
 (deftask push-release
   []
-  (comp
-   (build)
-   (push)))
+  (comp (build) (push)))
+
+(deftask dev-checkout
+  []
+  (comp (watch) (build)))

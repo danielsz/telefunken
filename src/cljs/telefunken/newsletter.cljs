@@ -28,15 +28,14 @@
     om/IDisplayName
     (display-name [this]
       "unsubscribe")
-    om/IRender
-    (render [_]
-      (let [flash (om/get-state owner :flash)
-            chsk-send! (om/get-state owner :chsk-send!)
-            email (:email (om/get-state owner :unsubscribe-details))
-            expiration (:expiration (om/get-state owner :unsubscribe-details))
+    om/IRenderState
+    (render-state [_ state]
+      (let [flash (:flash state)
+            chsk-send! (:chsk-send! state)
+            email (:email (:unsubscribe-details state))
+            expiration (:expiration (:unsubscribe-details state))
             valid? (fn [expiration]
                      (t/within? (t/interval (t/now) (t/plus (t/now) (t/months 1))) (parse-date expiration)))]
-        (when (some? email) (om/set-state! owner :button-status false))
         (dom/div #js {:className "row"}
                  (dom/div #js {:className "col-md-6 col-md-offset-3"}
                           (dom/div #js {:className "well"}
@@ -45,10 +44,9 @@
                                    (dom/p nil (str "Email: " email))
                                    (dom/button #js {:className "btn btn-default"
                                                     :type "submit"
-                                                    :disabled (om/get-state owner :button-status)
+                                                    :disabled (:button-status state)
                                                     :onClick (fn [_]
-                                                               (if (not (valid? expiration))
-                                                                 (f/warn flash "That link has expired")
+                                                               (if (valid? expiration)
                                                                  (chsk-send! [:telefunken/api {:unsubscribe-from-newsletter email}] 8000
                                                                              (fn [cb-reply]
                                                                                (match [cb-reply]
@@ -56,6 +54,7 @@
                                                                                       [{:info message}] (f/info flash message)
                                                                                       [{:error message}] (f/warn flash message)
                                                                                       [:chsk/timeout] (f/warn flash "The request timed out.")
-                                                                                      :else (println "no match found")))))
+                                                                                      :else (println "no match found"))))
+                                                                 (f/warn flash "That link has expired"))
                                                                (om/set-state! owner :button-status true))}
                                                "Confirm"))))))))
