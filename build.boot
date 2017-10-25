@@ -2,11 +2,14 @@
  :source-paths   #{"src/clj" "src/cljs"}
  :resource-paths #{"src/clj" "src/cljs"}
  :dependencies '[[com.draines/postal "2.0.2"]
-                 [org.clojure/tools.logging "0.3.1"]
+                 [org.clojure/tools.logging "0.4.0"]
                  [cljs-ajax "0.6.0"]
                  [org.danielsz/lang-utils "0.1.0-SNAPSHOT"]
+                 [org.danielsz/kryptos "0.1.0-SNAPSHOT"]
                  [clj-http "3.7.0"]
                  [environ "1.1.0"]
+                 [com.andrewmcveigh/cljs-time "0.5.0"]
+                 [org.clojure/core.match "0.3.0-alpha5"]
                  [org.danielsz/om-flash-bootstrap "0.1.0-SNAPSHOT"]])
 
 (task-options!

@@ -1,17 +1,12 @@
 (ns telefunken.newsletter
   (:require
-   [twitter-fu.common.crypto :as crypto]
+   [kryptos.core :as crypto]
    [detijd.core :as t]
    [environ.core :refer [env]]
+   [compojure.core :refer [GET routes context]]
    [ring.util
     [codec :refer [url-encode]]
     [response :as util]]))
-
-(defn endpoints [_]
-  (routes
-   (context "/unsubscribe" []
-     (GET "/" [] (html/index))
-     (GET "/:email/:expiration/:signature" req (redirect req)))))
 
 (defn redirect [{headers :headers session :session {email :email expiration :expiration signature :signature} :params :as req}]
   (let [valid-signature? #(= signature (crypto/sign (crypto/decode-base64 (:twitter-fu-symmetric-key env) :key) (str email "/" expiration)))]
@@ -23,6 +18,11 @@
             (assoc :session session)))
       (-> (util/redirect (str "http://" (get headers "host")))
           (assoc :session {:authentication-error "Signature invalid."})))))
+
+(defn endpoints [_]
+  (routes
+   (context "/unsubscribe" []
+     (GET "/:email/:expiration/:signature" req (redirect req)))))
 
 (defn generate-unsubscribe-link [host email]
   (let [expiration (crypto/encode-base64-url (t/a-month-from-today-str))
