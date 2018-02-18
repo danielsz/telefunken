@@ -1,4 +1,4 @@
-(ns telefunken.newsletter
+(ns telefunken.newsletter {:deprecated "0.1.0"}
   (:require
    [kryptos.core :as crypto]
    [detijd.core :as t]
