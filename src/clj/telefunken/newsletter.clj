@@ -1,4 +1,4 @@
-(ns telefunken.newsletter {:deprecated "0.1.0"}
+(ns telefunken.newsletter {:deprecated "0.1.0"} ; use signed request instead
   (:require
    [kryptos.core :as crypto]
    [detijd.core :as t]
