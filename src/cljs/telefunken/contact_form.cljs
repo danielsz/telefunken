@@ -2,7 +2,8 @@
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
             [cljs-utils.core :refer [form-data]]
-            [om-flash-bootstrap.core :as f]))
+            [om-flash-bootstrap.core :as f]
+            [goog.net.XhrIo :as xhr]))
 
 (defn contact
   "Om component for new contact"
@@ -31,16 +32,16 @@
                                                           (f/warn flash (.-validationMessage (.-target e))))
                                              :onSubmit (fn [e]
                                                          (.preventDefault e)
-                                                         (.send goog.net.XhrIo "/contact" (fn [e]
-                                                                                            (f/bless flash (str "Mail succesfully sent from " (from-fn @data)))
-                                                                                            (om/set-state! owner :subject "")
-                                                                                            (om/set-state! owner :body "")
-                                                                                            (om/set-state! owner :submit-status true))
-                                                                "POST"
-                                                                (form-data {:from (from-fn @data)
-                                                                            :subject (om/get-state owner :subject)
-                                                                            :body (om/get-state owner :body)})
-                                                                #js {"X-CSRF-Token" js/antiForgeryToken}))}
+                                                         (xhr/send "/contact" (fn [e]
+                                                                                (f/bless flash (str "Mail succesfully sent from " (from-fn @data)))
+                                                                                (om/set-state! owner :subject "")
+                                                                                (om/set-state! owner :body "")
+                                                                                (om/set-state! owner :submit-status true))
+                                                                   "POST"
+                                                                   (form-data {:from (from-fn @data)
+                                                                               :subject (om/get-state owner :subject)
+                                                                               :body (om/get-state owner :body)})
+                                                                   #js {"X-CSRF-Token" js/antiForgeryToken}))}
                                         (dom/div #js {:className "form-group"}
                                                  (dom/label #js {:htmlFor "subject"} "Subject")
                                                  (dom/input #js {:className "form-control"
