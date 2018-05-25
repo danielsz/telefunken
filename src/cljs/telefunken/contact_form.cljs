@@ -1,8 +1,8 @@
 (ns telefunken.contact-form
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [om-flash-bootstrap.core :as f]
-            [ajax.core :refer [POST]]))
+            [cljs-utils.core :refer [form-data]]
+            [om-flash-bootstrap.core :as f]))
 
 (defn contact
   "Om component for new contact"
@@ -10,10 +10,9 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:submit-status false})
-    om/IWillMount
-    (will-mount [_]
-      (om/set-state! owner :submit-status (not ((om/get-state owner :logged-in?)))))
+      {:submit-status false
+       :subject ""
+       :body ""})
     om/IDisplayName
     (display-name [this]
       "contact")
@@ -21,48 +20,46 @@
     (render [_]
       (let [flash (om/get-state owner :flash)
             chsk-send! (om/get-state owner :chsk-send!)
-            logged-in? (om/get-state owner :logged-in?)
             chsk-state (om/get-state owner :chsk-state)
             from-fn (om/get-state owner :from-fn)]
-        (dom/div #js {:className "row"}
-                 (dom/div #js {:className "col-md-6 col-md-offset-3"}
-                          (dom/div #js {:className "well"}
-                                   (dom/h3 nil "Email")
-                                   (dom/form nil
-                                             (dom/div #js {:className "form-group"}
-                                                      (dom/label #js {:htmlFor "subject"} "Subject")
-                                                      (dom/input #js {:className "form-control"
-                                                                      :id "subject"
-                                                                      :ref "subject"
-                                                                      :required "required"
-                                                                      :disabled (not (logged-in?))
-                                                                      :type "text"
-                                                                      :placeholder "Please type the subject of your inquiry"}))
-                                             (dom/div #js {:className "form-group"}
-                                                      (dom/label #js {:htmlFor "body"} "Body")
-                                                      (dom/textarea #js {:className "form-control"
-                                                                         :id "body"
-                                                                         :ref "body"
-                                                                         :required "required"
-                                                                         :disabled (not (logged-in?))
-                                                                         :rows "5"
-                                                                         :placeholder "Please type the content of your inquiry"}))
-                                             (dom/button #js {:className "btn btn-default"
-                                                              :type "submit"
-                                                              :disabled (om/get-state owner :submit-status)
-                                                              :onClick (fn [e]
-                                                                         (.preventDefault e)
-                                                                         (if-not (logged-in?) (f/warn flash "Please sign in first")
-                                                                                 (if (.checkValidity (om/get-node owner "body"))
-                                                                                   (POST "/contact" {:headers {"X-CSRF-Token" (:csrf-token @chsk-state)}
-                                                                                                     :params {:from (from-fn @data)
-                                                                                                              :subject (.-value (om/get-node owner "subject"))
-                                                                                                              :body (.-value (om/get-node owner "body"))}
-                                                                                                     :handler (fn [response]
-                                                                                                                (f/bless flash (str "Mail succesfully sent from " response))
-                                                                                                                (set! (.-value (om/get-node owner "body")) "")
-                                                                                                                (set! (.-value (om/get-node owner "subject")) "")
-                                                                                                                (om/set-state! owner :submit-status true))
-                                                                                                     :error-handler (fn [status status-test] (f/bless flash "Succesfully published"))})
-                                                                                   (f/warn flash (.-validationMessage (om/get-node owner "body"))))))} "Submit"))
-                                   (dom/p nil (when-not (logged-in?) "Please sign in before typing your message.")))))))))
+        (dom/div #js {:className "content"}
+                 (dom/section #js {:id "contact-section"}
+                              (dom/h3 nil "Contact form")
+                              (dom/form #js {:id "contact-form"
+                                             :className "ui-elem"
+                                             :onInvalid (fn [e]
+                                                          (f/warn flash (.-validationMessage (.-target e))))
+                                             :onSubmit (fn [e]
+                                                         (.preventDefault e)
+                                                         (.send goog.net.XhrIo "/contact" (fn [e]
+                                                                                            (f/bless flash (str "Mail succesfully sent from " (from-fn @data)))
+                                                                                            (om/set-state! owner :subject "")
+                                                                                            (om/set-state! owner :body "")
+                                                                                            (om/set-state! owner :submit-status true))
+                                                                "POST"
+                                                                (form-data {:from (from-fn @data)
+                                                                            :subject (om/get-state owner :subject)
+                                                                            :body (om/get-state owner :body)})
+                                                                #js {"X-CSRF-Token" js/antiForgeryToken}))}
+                                        (dom/div #js {:className "form-group"}
+                                                 (dom/label #js {:htmlFor "subject"} "Subject")
+                                                 (dom/input #js {:className "form-control"
+                                                                 :required "required"
+                                                                 :type "text"
+                                                                 :placeholder "Please type the subject of your inquiry"
+                                                                 :onChange (fn [e] (let [val (.-value (.-target e))]
+                                                                                    (om/set-state! owner :subject val)))
+                                                                 :value (om/get-state owner :subject)}))
+                                        (dom/div #js {:className "form-group"}
+                                                 (dom/label #js {:htmlFor "body"} "Body")
+                                                 (dom/textarea #js {:className "form-control"
+                                                                    :required "required"
+                                                                    :rows "5"
+                                                                    :placeholder "Please type the content of your inquiry"
+                                                                    :onChange (fn [e] (let [val (.-value (.-target e))]
+                                                                                       (om/set-state! owner :body val)))
+                                                                    :value (om/get-state owner :body)}))
+                                        (dom/input #js {:type "submit"
+                                                        :name "submit"
+                                                        :value "Send"
+                                                        :disabled (om/get-state owner :submit-status)}))))))))
