@@ -20,8 +20,6 @@
     om/IRender
     (render [_]
       (let [flash (om/get-state owner :flash)
-            chsk-send! (om/get-state owner :chsk-send!)
-            chsk-state (om/get-state owner :chsk-state)
             from-fn (om/get-state owner :from-fn)]
         (dom/div #js {:className "content"}
                  (dom/section #js {:id "contact-section"}
