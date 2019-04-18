@@ -6,7 +6,7 @@
                  [cljs-ajax "0.6.0"]
                  [org.danielsz/lang-utils "0.1.0-SNAPSHOT"]
                  [org.danielsz/kryptos "0.1.0-SNAPSHOT"]
-                 [clj-http "3.7.0"]
+                 [clj-http "3.9.1"]
                  [environ "1.1.0"]
                  [org.danielsz/cljs-utils "0.1.1"]
                  [com.andrewmcveigh/cljs-time "0.5.0"]

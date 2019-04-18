@@ -13,24 +13,17 @@
                  :pass (:telefunken-smtp-password env)
                  :port (Integer. ^String (:telefunken-smtp-port env))})
 
-(defn email [to subject body & {:keys [bcc]}] 
+(defn email [to subject body & {:keys [bcc reply-to]}]
   (send-message (config)
                 {:from (:telefunken-email env)
                  :to to
                  :bcc bcc
+                 :reply-to reply-to
                  :subject subject
                  :body [{:type "text/html" :content body}]
                  :message-id (if-let [domain (:telefunken-hostname env)]
                                #(message-id domain)
                                #(message-id (str "postal." (.getHostName (InetAddress/getLocalHost)))))}))
-
-(defn email-from [from subject body & {:keys [type to] :or {type "text/plain"
-                                                            to (:telefunken-email env)}}]
-  (send-message (config)
-                {:from from
-                 :to to
-                 :subject subject
-                 :body [{:type type :content body}]}))
 
 (defn email-with-pdf [to subject body document]
   (send-message (config)
