@@ -14,7 +14,7 @@
 (task-options!
  push {:repo-map {:url "https://clojars.org/repo/"}}
  pom {:project 'org.danielsz/telefunken
-      :version "0.1.4-SNAPSHOT"
+      :version "0.1.6"
       :scm {:name "git"
             :url "https://github.com/danielsz/telefunken"}})
 

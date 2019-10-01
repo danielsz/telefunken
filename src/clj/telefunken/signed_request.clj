@@ -29,3 +29,6 @@
         email (crypto/encode-base64-url email)
         signature (crypto/sign (crypto/decode-base64 (:telefunken-symmetric-key env) :key) (str email "/" created_at))]
     (str host "/" route "/" email "/" created_at "/" signature)))
+
+(defn generate-unsubscribe-link [host email]
+  (generate-signed-request-link host email "unsubscribe"))
