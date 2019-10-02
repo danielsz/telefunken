@@ -6,8 +6,7 @@
    [compojure.core :refer [GET routes context]]
    [ring.util
     [codec :refer [url-encode]]
-    [response :as util]]
-   [clojure.tools.logging :as log])
+    [response :as util]])
   (:import [java.time Instant]))
 
 (defn redirect [{headers :headers session :session {email :email created_at :created_at signature :signature} :params :as req} route]
