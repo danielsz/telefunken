@@ -1,21 +1,20 @@
 (ns telefunken.telegram
   (:require [clj-http.client :as client]
-            [environ.core :refer [env]]
             [lang-utils.async :refer [with-async]]
             [clojure.string :as str]))
 
-(def self-test #(client/get (str "https://api.telegram.org/bot" (:telegram-bot-token env) "/getMe")
+(def self-test #(client/get (str "https://api.telegram.org/bot" (System/getProperty "telefunken.bot.token") "/getMe")
                             {:throw-exceptions false
                              :as :auto}))
 
-(def get-updates #(client/get (str "https://api.telegram.org/bot" (:telegram-bot-token env) "/getUpdates")
+(def get-updates #(client/get (str "https://api.telegram.org/bot" (System/getProperty "telefunken.bot.token") "/getUpdates")
                               {:throw-exceptions false
                                :as :auto}))
 
 (defn send-message [text]
-  (client/post (str "https://api.telegram.org/bot" (:telegram-bot-token env) "/sendMessage")
+  (client/post (str "https://api.telegram.org/bot" (System/getProperty "telefunken.bot.token") "/sendMessage")
                {:throw-exceptions false
-                :form-params {:chat_id (Integer. ^String (:telegram-chat-id env))
+                :form-params {:chat_id (Integer. ^String (System/getProperty "telefunken.chat.id"))
                               :text text
                               :parse_mode "Markdown"}
                 :as :json}))

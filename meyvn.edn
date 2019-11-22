@@ -36,9 +36,7 @@
    :main "main.core"},
   :tools-deps-alias :cljs},
  :testing {:enabled false, :tools-deps-alias :test},
- :scm {:enabled false
-       :name "git"
-       :url "https://github.com/danielsz/telefunken"},
+ :scm {:enabled true},
  :interactive
  {:enabled false,
   :tools-deps-alias :repl,

@@ -1,10 +1,9 @@
 (ns telefunken.contact-form
   (:require [telefunken.core :refer [email]]
-            [compojure.core :refer [POST routes]]
-            [environ.core :refer [env]]))
+            [compojure.core :refer [POST routes]]))
 
 (defn email-form-handler [from subject body]
-  (future (email (:telefunken-contact-email env) subject body :reply-to from))
+  (future (email (System/getProperty "telefunken.contact.email") subject body :reply-to from))
   {:status 200 :headers {} :body from})
 
 (defn endpoint [_]
