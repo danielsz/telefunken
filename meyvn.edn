@@ -1,7 +1,7 @@
 {:pom
  {:group-id "org.danielsz",
   :artifact-id "telefunken",
-  :version "0.1.8",
+  :version "0.1.9",
   :name "telefunken"},
  :packaging
  {:uberjar
