@@ -1,6 +1,7 @@
 (ns telefunken.core
   (:require [postal.core :refer [send-message]]
-            [postal.support :refer [message-id]])
+            [postal.support :refer [message-id]]
+            [clojure.java.io :as io])
   (:import java.net.InetAddress))
 
 (defn email? [s]
@@ -33,5 +34,5 @@
                  :body [{:type "text/html"
                          :content body}
                         {:type :inline
-                         :content (java.io.File. ^String document)
+                         :content (io/as-file ^String document)
                          :content-type "application/pdf"}]}))
