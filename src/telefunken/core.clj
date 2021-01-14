@@ -20,7 +20,7 @@
                  :bcc bcc
                  :reply-to reply-to
                  :subject subject
-                 :body [{:type "text/html" :content body}]
+                 :body [{:type "text/html; charset=utf-8" :content body}]
                  :message-id (if-let [domain (System/getProperty "telefunken.hostname")]
                                #(message-id domain)
                                #(message-id (str "postal." (.getHostName (InetAddress/getLocalHost)))))}))
@@ -31,7 +31,7 @@
                  :to to
                  :bcc "bellybag@gmail.com"
                  :subject subject
-                 :body [{:type "text/html"
+                 :body [{:type "text/html; charset=utf-8"
                          :content body}
                         {:type :inline
                          :content (io/as-file ^String document)
