@@ -8,7 +8,7 @@
 
 ;; To create a symmetric key: (crypto/new-telefunken-key)
 
-(defn redirect [{headers :headers session :session {email :email created_at :created_at signature :signature} :params :as req} route]
+(defn redirect [route {headers :headers session :session {email :email created_at :created_at signature :signature} :params :as req}]
   (let [valid-signature? #(= signature (crypto/sign (crypto/decode-base64 (System/getProperty "telefunken.symmetric.key") :key) (str email "/" created_at)))
         session (assoc session (keyword route) (if (valid-signature?)
                                                  {:email (crypto/decode-base64-url email) :created_at (crypto/decode-base64-url created_at)}
@@ -16,11 +16,9 @@
     (-> (util/redirect (str "http://" (get headers "host") "/" route))
         (assoc :session session))))
 
-(defn create-signed-request-endpoint [route]
-  (fn [_]
-    (routes
-     (context (str "/" route) []
-       (GET "/:email/:created_at/:signature" req (redirect req route))))))
+(defn signed-request-endpoint [route]
+  [(str "/" route)
+   ["/:email/:created_at/:signature" {:get (partial redirect route)}]])
 
 (defn generate-signed-request-link [host email route]
   (let [created_at (crypto/encode-base64-url (str (Instant/now)))
