@@ -1,14 +1,13 @@
 (ns telefunken.signed-request
   (:require
    [kryptos.core :as crypto]
-   [compojure.core :refer [GET routes context]]
    [ring.util
     [response :as util]])
   (:import [java.time Instant]))
 
 ;; To create a symmetric key: (crypto/new-telefunken-key)
 
-(defn redirect [route {headers :headers session :session {email :email created_at :created_at signature :signature} :params :as req}]
+(defn redirect [route {headers :headers session :session {email :email created_at :created_at signature :signature} :path-params :as req}]
   (let [valid-signature? #(= signature (crypto/sign (crypto/decode-base64 (System/getProperty "telefunken.symmetric.key") :key) (str email "/" created_at)))
         session (assoc session (keyword route) (if (valid-signature?)
                                                  {:email (crypto/decode-base64-url email) :created_at (crypto/decode-base64-url created_at)}
