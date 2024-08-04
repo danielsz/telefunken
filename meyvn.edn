@@ -32,8 +32,8 @@
   :tools-deps-alias :cljs},
  :testing {:enabled false, :tools-deps-alias :test},
  :scm {:enabled true},
- :distribution-management {:id "sapiens"
-                           :url "https://nexus.tuppu.net/repository/sapiens/"}
+ :distribution-management {:id "reposilite"
+                           :url "https://reposilite.tuppu.net/sapiens/"}
  :interactive
  {:enabled false,
   :tools-deps-alias :repl,
