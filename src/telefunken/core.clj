@@ -2,7 +2,10 @@
   (:require [postal.core :refer [send-message]]
             [postal.support :refer [message-id]]
             [clojure.java.io :as io])
-  (:import java.net.InetAddress))
+  (:import java.net.InetAddress
+           java.nio.file.Paths
+           java.nio.file.Files
+           java.net.URI))
 
 (defn email? [s]
   (let [regex #"(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"]
@@ -27,7 +30,17 @@
                                #(message-id domain)
                                #(message-id (str "postal." (.getHostName (InetAddress/getLocalHost)))))}))
 
-(defn email-with-pdf [to subject body document]
-  (email to subject body :attachments [{:type :inline
-                                        :content (io/as-file ^String document)
-                                        :content-type "application/pdf"}]))
+
+(defn email-with-attachment [to subject body pathname & {:keys [type] :or {type :inline}}]
+  {:pre [(some #{:inline :attachment} [type])]}
+  (let [path (Paths/get (URI. (str "file://" ^String pathname)))
+        mime-type (Files/probeContentType path)]
+    (email to subject body :attachments (case type
+                                          :inline [{:type :inline
+                                                    :content (io/as-file ^String pathname)
+                                                    :content-type mime-type}]
+                                          :attachment [{:type :attachment
+                                                        :content (io/as-file ^String pathname)}]))))
+
+(def email-with-image email-with-attachment)
+(def email-with-pdf email-with-attachment)
